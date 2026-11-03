@@ -159,6 +159,26 @@
   $('#btn-sound').addEventListener('click', () => { sound.set(!sound.on); syncSoundBtn(); sound.play('move'); });
   syncSoundBtn();
 
+  /* ---------- dark mode ---------- */
+  function syncThemeBtn() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const b = $('#btn-theme');
+    b.textContent = dark ? '\u2600\uFE0F' : '\u{1F319}';
+    b.setAttribute('aria-pressed', String(dark));
+    b.title = b.ariaLabel = dark ? 'Switch to light mode' : 'Switch to dark mode';
+  }
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    store('theme', t);
+    syncThemeBtn();
+  }
+  $('#btn-theme').addEventListener('click', () => setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
+  if (window.matchMedia) {
+    // until you press the button yourself, follow the computer's own light/dark setting
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => { if (!store('theme')) { document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light'); syncThemeBtn(); } });
+  }
+  syncThemeBtn();
+
   /* ---------- API ---------- */
   async function api(path, { method = 'GET', body } = {}) {
     const headers = { 'Content-Type': 'application/json' };
